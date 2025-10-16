@@ -75,6 +75,25 @@ void GpoCore::write(int bit_value, int bit_pos) {
    io_write(base_addr, DATA_REG, wr_data);
 }
 
+void GpoCore::set_blink_period_cycles(uint32_t cycles) {
+   // Forward the raw clock-cycle count directly to the speed register so the
+   // HDL block can use it as the on/off dwell time for the blink sequencer.
+   io_write(base_addr, SPEED_REG, cycles);
+}
+
+void GpoCore::set_blink_period_ms(uint32_t period_ms) {
+   // Convert the requested millisecond duration into clock cycles using the
+   // configured system clock frequency. The blink peripheral interprets the
+   // value as the number of cycles to hold each LED state.
+   uint64_t cycles = (uint64_t) period_ms * SYS_CLK_FREQ * 1000;
+   // Clamp the calculated value to the 32-bit range accepted by the hardware so
+   // excessively large periods do not wrap around when written to the register.
+   if (cycles > 0xffffffffULL) {
+      cycles = 0xffffffffULL;
+   }
+   set_blink_period_cycles((uint32_t) cycles);
+}
+
 /**********************************************************************
  * PwmCore
  **********************************************************************/

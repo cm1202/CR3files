@@ -77,8 +77,9 @@ module mmio_sys_vanilla
     );
    //assign rd_data_array[1] = 32'h00000000;
 
-   // slot 2: gpo 
-   chu_gpo #(.W(N_LED)) gpo_slot2 
+   // slot 2: blinking gpo. Replaces the fixed-output GPO with the enhanced
+   // variant that accepts both pattern and speed registers for LED timing.
+   chu_gpo_blink #(.W(N_LED)) gpo_slot2
    (.clk(clk),
     .reset(reset),
     .cs(cs_array[`S2_LED]),
