@@ -82,7 +82,7 @@ public:
     */
    enum {
       DATA_REG = 0, /**< output data register */
-      SPEED_REG = 1 /**< blink speed register: dwell time for LED on/off */
+      SPEED_REG= 1
    };
    /**
     * constructor.
@@ -105,23 +105,11 @@ public:
     * @param bit_pos bit position
     *
     */
-   void write(int bit_value, int bit_pos);
+  void set_mask(uint32_t mask); 
 
-   /**
-    * set the blink period in raw clock cycles (half-period).
-    * Writing the raw cycle count lets firmware map timing decisions directly
-    * to the hardware state machine.
-    * @param cycles number of system clock cycles per LED on/off interval
-    */
-   void set_blink_period_cycles(uint32_t cycles);
+  void set_speed_ms(uint16_t ms);
 
-   /**
-    * set the blink period in milliseconds.
-    * The helper performs the math to translate a human-friendly duration into
-    * the value understood by the blink register.
-    * @param period_ms length of the on/off interval in milliseconds
-    */
-   void set_blink_period_ms(uint32_t period_ms);
+  void set_blink(uint32_t mask, uint16_t ms); 
 
 private:
    uint32_t base_addr;
