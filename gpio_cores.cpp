@@ -74,25 +74,22 @@ void GpoCore::write(int bit_value, int bit_pos) {
    bit_write(wr_data, bit_pos, bit_value);
    io_write(base_addr, DATA_REG, wr_data);
 }
+void GpoCore::set_mask(uint32_t mask) {
+    wr_data = mask;                           // cache
+    io_write(base_addr, DATA_REG, wr_data);   // word index 0
+  }
 
-void GpoCore::set_blink_period_cycles(uint32_t cycles) {
-   // Forward the raw clock-cycle count directly to the speed register so the
-   // HDL block can use it as the on/off dwell time for the blink sequencer.
-   io_write(base_addr, SPEED_REG, cycles);
-}
+ void GpoCore::set_speed_ms(uint16_t ms) {
+    io_write(base_addr, SPEED_REG, static_cast<uint32_t>(ms)); // word index 1
+  }
 
-void GpoCore::set_blink_period_ms(uint32_t period_ms) {
-   // Convert the requested millisecond duration into clock cycles using the
-   // configured system clock frequency. The blink peripheral interprets the
-   // value as the number of cycles to hold each LED state.
-   uint64_t cycles = (uint64_t) period_ms * SYS_CLK_FREQ * 1000;
-   // Clamp the calculated value to the 32-bit range accepted by the hardware so
-   // excessively large periods do not wrap around when written to the register.
-   if (cycles > 0xffffffffULL) {
-      cycles = 0xffffffffULL;
-   }
-   set_blink_period_cycles((uint32_t) cycles);
-}
+  // NEW: set mask + speed together
+ void GpoCore::set_blink(uint32_t mask, uint16_t ms) {
+    // write mask first so speed change takes effect on the intended LEDs
+    io_write(base_addr, DATA_REG, mask);
+    io_write(base_addr, SPEED_REG, static_cast<uint32_t>(ms));
+    wr_data = mask;  // keep our cache consistent
+  }
 
 /**********************************************************************
  * PwmCore
