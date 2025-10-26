@@ -105,7 +105,14 @@ public:
     * @param bit_pos bit position
     *
     */
-  void set_mask(uint32_t mask); 
+   void write(int bit_value, int bit_pos);
+
+   /**
+    * Update the LED mask register.
+    *
+    * @param mask bitmap of LEDs to drive
+    */
+   void set_mask(uint32_t mask);
 
   void set_speed_ms(uint16_t ms);
 
