@@ -29,7 +29,7 @@ module blink_controller(
     );
     logic tic; 
     logic sig, nsig;
-    logic count, ncount;
+    logic [15:0] count, ncount;
     
     m_counter myms_counter(
     .clk(clk),
@@ -37,34 +37,37 @@ module blink_controller(
     .tic(tic)
     );
     
-    always_ff@(posedge(clk), posedge(rst)) begin
-        if(rst) begin
-            count<=0;
-            sig<=0; 
-            end
+    always_ff @(posedge clk, posedge rst) begin
+        if (rst) begin
+            count <= '0;
+            sig   <= 1'b0;
+        end
         else begin
-            count <=ncount;
-            sig <= nsig; 
+            count <= ncount;
+            sig   <= nsig;
         end
     end
+
     always_comb begin
-        if(tic) begin
-            ncount = ncount+1; 
-            if(count>=(speed-1))begin
-                nsig = ~sig; 
-                ncount = 0; 
+        ncount = count;
+        nsig   = sig;
+
+        if (tic) begin
+            if (speed <= 16'd1) begin
+                ncount = '0;
+                nsig   = 1'b0;
+            end
+            else if (count >= (speed - 1)) begin
+                ncount = '0;
+                nsig   = ~sig;
             end
             else begin
-                nsig = sig; 
-           end
-           end
-           else begin 
-           ncount = count; 
-           nsig = sig; 
-           end 
-           end 
-           
-           assign led = (speed ==16'd0) ? 1'b0: sig; 
+                ncount = count + 16'd1;
+            end
+        end
+    end
+
+    assign led = sig;
                 
     
             

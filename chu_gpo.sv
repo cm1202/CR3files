@@ -17,9 +17,7 @@ module chu_gpo
 
    logic [W-1:0] buf_reg;      // LED pattern
    logic [31:0] speed_reg;     // clock cycles
-   logic blink_sig; 
-   logic [31:0] blink_counter; // cycle counter
-   logic blink_state;          
+   logic blink_sig;
    logic wr_en_data;
    logic wr_en_speed;
 
@@ -30,7 +28,7 @@ module chu_gpo
       if (reset)
          buf_reg <= '0;
       else if (wr_en_data)
-         buf_reg <= wr_data[15:0];
+         buf_reg <= wr_data[W-1:0];
    end
 
    // speed 
@@ -50,7 +48,7 @@ module chu_gpo
     .led(blink_sig)
     ); 
     
-    assign dout = buf_reg & {W{blink_sig}}; 
+    assign dout = blink_sig ? buf_reg : '0;
 endmodule
        
 
